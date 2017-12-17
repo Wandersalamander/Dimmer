@@ -6,7 +6,7 @@ appindicator.py:
 dimmer.py:
 
     Core script to autocontroll the brighness, no flags supported
-    but congif.py available to set preferences
+    but config.py available to set preferences
 
 config.py:
     user preferences, 
