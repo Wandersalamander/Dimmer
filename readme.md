@@ -17,4 +17,4 @@ https://github.com/wavexx/acpilight
     user preferences, 
     default set empirically at this time
 
-all modules are testet on ubuntu 17
+all modules are testet on ubuntu 17.10
