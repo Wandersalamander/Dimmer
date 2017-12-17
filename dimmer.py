@@ -6,42 +6,23 @@ import subprocess
 import time
 import config
 
-# def sigmoid(x, fmin, fmax, fsteep):
-#     # interesting from x=-255 to 255
-#     return (fmax - fmin) / (1 + np.exp(-x * fsteep * 8 / 255)) + fmin
-
 
 def get_img():
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
     cam.start()
     img = cam.get_image()
-    # img2 = cam.get_image()
-    # img3 = cam.get_image()
     cam.stop()
-    # import pygame.image
     imgdata = pygame.surfarray.array3d(img)
-    # imgdata2 = pygame.surfarray.array3d(img2)
-    # imgdata3 = pygame.surfarray.array3d(img3)
-    # imgdata = (imgdata + imgdata2 + imgdata3)
-    # imgdata = np.sum(imgdata, axis=2) / 3
-    # return imgdata
     return 3 * imgdata
 
 
 def change_brightness(val):
-    '''val: int, 0=< val <= 1'''
+    '''val: int, 0=< val <= 100'''
     acpilight_path = config.backlight_path
     val = str(int(val))
     subprocess.call([acpilight_path, "-time", str(config.xb_time),
                      "-steps", str(config.xb_steps), "-set", val])
-
-
-# def show_sigmoind():
-#     x = np.linspace(0, 255)
-#     print(np.mean(get_img()))
-#     plt.plot(x, sigmoid((x * 2) - 255, fmin=0, fmax=100, fsteep=1))
-#     plt.show()
 
 
 def weight_img(img):
@@ -60,7 +41,7 @@ def main():
                 prev_vals = [img_val]
             else:
                 prev_vals.append(img_val)
-            # smooth by last values to prevent oscillation
+            # smooth by last values to prevent oscillation of brightness
             if len(prev_vals) < (config.averaging - 1):
                 prev_vals = prev_vals[:(config.averaging - 1)]
 
