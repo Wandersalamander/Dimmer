@@ -2,7 +2,6 @@
 
 from gi.repository import Gtk
 from gi.repository import AppIndicator3 as appindicator
-import os
 import dimmer
 import signal
 from multiprocessing import Process
