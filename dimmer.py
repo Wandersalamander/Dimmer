@@ -8,13 +8,14 @@ import config
 
 
 def get_img():
+    '''gets webcam image and returns it as array'''
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
     cam.start()
     img = cam.get_image()
     cam.stop()
     imgdata = pygame.surfarray.array3d(img)
-    return 3 * imgdata
+    return imgdata
 
 
 def change_brightness(val):
@@ -26,7 +27,7 @@ def change_brightness(val):
 
 
 def weight_img(img):
-    img = np.mean(img) / 170 * 100
+    img = 3 * np.mean(img) / 170 * 100
     return int(img)
 
 
