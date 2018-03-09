@@ -2,7 +2,8 @@
 
 # command to backlight or xbacklight
 backlight_path = "/home/simtron/Documents/Python/acpilight/xbacklight"
-xb_time = 1000  # milliseconds to switch brightness, xbacklight time
+# milliseconds to switch brightness, (argument passed to xbacklight)
+xb_time = 1000
 xb_steps = 25  # steps to change brightness, xbacklight steps
 
 sleep = 10  # seconds, time between photo detection
@@ -14,7 +15,7 @@ averaging = 10  # last n photos to be considered
 # following brigthness values applie to these borders
 ######
 
-averaging_ignore = 20  # jump to measured brigthness if
+jump_theshold = 20  # jump to measured brigthness if
 # differenc to average brighness is higher than this value
 # for example:
 # average = 30, measured = 80

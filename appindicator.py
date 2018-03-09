@@ -14,6 +14,10 @@ http://orkon.github.io/2014/08/31/extending-your-ubuntu-desktop-with-custom-indi
 
 
 class MyIndicator:
+    '''Automated brighness controll GTK-appindicator.
+
+    '''
+
     def __init__(self):
         self.ind = appindicator.Indicator.new(
             "Autodimmer",
@@ -37,21 +41,33 @@ class MyIndicator:
         self.ind.set_menu(self.menu)
 
     def main(self):
+        '''Starts GTK mainloop.
+
+        '''
         print("running main")
         self.start_dimmer()
         Gtk.main()
 
     def start_dimmer(self):
+        '''Starts automatic brightness controll.
+
+        '''
         self.ind.set_icon(_curr_dir + 'dim_small.png')
         self.p = Process(target=dimmer.main)
         self.p.start()
 
     def stop_dimmer(self):
+        '''Stops automatic brightness controll.
+
+        '''
         if self.p.is_alive():
             self.ind.set_icon(_curr_dir + 'dim_grey_small.png')
             self.p.terminate()
 
     def toggle_stop(self, widget):
+        '''Decides wether to start or stop automatic brightness controll.
+
+        '''
         if self.p.is_alive():
             self.stop_dimmer()
         else:
@@ -59,6 +75,8 @@ class MyIndicator:
         self.ind.set_status(appindicator.IndicatorStatus.ACTIVE)
 
     def quit(self, widget):
+        '''Terminates appindicator.
+        '''
         self.stop_dimmer()
         Gtk.main_quit()
 

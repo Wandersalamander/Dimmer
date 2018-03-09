@@ -8,18 +8,31 @@ import config
 
 
 def get_img():
-    '''gets webcam image and returns it as array'''
+    '''Gets webcam image and returns it as array.
+
+    Returns
+    -------
+    :obj:`numpy.ndarray`
+        Image taken by webcam
+
+    '''
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
     cam.start()
     img = cam.get_image()
     cam.stop()
     imgdata = pygame.surfarray.array3d(img)
-    return imgdata
+    return np.array(imgdata)
 
 
 def change_brightness(val):
-    '''val: int, 0=< val <= 100'''
+    '''Sets screen brightness.
+
+    Parameters
+    ----------
+    val : int
+        Brightness Value
+        0 =< val <= 100'''
     acpilight_path = config.backlight_path
     val = str(int(val))
     subprocess.call([acpilight_path, "-time", str(config.xb_time),
@@ -27,18 +40,32 @@ def change_brightness(val):
 
 
 def weight_img(img):
+    '''Weights image by mean and scales mean value.
+
+    Parameters
+    ----------
+    img : array
+
+    Returns
+    -------
+    int
+        Weight of image
+
+    '''
     img = 3 * np.mean(img) / 170 * 100
     return int(img)
 
 
 def main():
+    '''Mainloop to autocontroll brightness.
+    '''
     prev_vals = [100]
     prev_mean = None
     while True:
         try:
             img_val = weight_img(get_img())
             # if deviation is high, reset prev_vals
-            if abs(img_val - np.mean(prev_vals)) > 20:
+            if abs(img_val - np.mean(prev_vals)) > config.jump_theshold:
                 prev_vals = [img_val]
             else:
                 prev_vals.append(img_val)
