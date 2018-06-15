@@ -10,4 +10,3 @@ dimmer.py:
 
 config.py:
     user preferences, 
-    default set empirically at this time

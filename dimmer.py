@@ -4,7 +4,6 @@ import pygame.camera
 import numpy as np
 import subprocess
 from time import sleep, time
-from datetime import date
 from datetime import datetime
 import config
 from sklearn.ensemble import RandomForestRegressor
@@ -14,7 +13,12 @@ import os
 
 
 def get_img():
-    '''gets webcam image and returns it as array'''
+    '''Gets webcam image and returns it as array
+
+    Returns
+    -------
+    ndarray
+        image taken by webcam'''
     print("detecting brightness")
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
@@ -25,8 +29,14 @@ def get_img():
     return imgdata
 
 
-def change_brightness(val):
-    '''val: int, 0=< val <= 100'''
+def change_brightness(val: int):
+    '''Changes screen brightbess
+
+    Parameters
+    ----------
+    val: int
+        value between 0 and 100
+        100 -> maximum brightness is set'''
     acpilight_path = config.backlight_path
     val = str(int(val))
     subprocess.call([
@@ -40,7 +50,14 @@ def change_brightness(val):
 
 
 def get_brightness():
-    '''val: int, 0=< val <= 100'''
+    '''Reads current brightness
+
+
+    Returns
+    -------
+    int,
+        0=< val <= 100
+    '''
     acpilight_path = config.backlight_path
     cmd = " ".join([acpilight_path, "-get"])
     process = subprocess.Popen(cmd, shell=True,
@@ -53,7 +70,20 @@ def get_brightness():
 
 
 def preprocess(img, res=4):
-    '''Returns flat ndarray'''
+    '''Image Preprocessing
+
+    Parameters
+    ----------
+    img: ndarray
+        image to process
+    res: int, optional
+        resolution to scale the image down
+
+    Returns
+    -------
+    ndarray
+        flat array containing
+        processed image data'''
     img = imresize(img, size=(res, res), interp="lanczos")
     img = np.mean(img, axis=2)
     img = img.flatten()
@@ -61,6 +91,13 @@ def preprocess(img, res=4):
 
 
 def infos():
+    '''Additional infos of current time
+
+    Returns
+    -------
+    list:
+        [mont, weekday, hour]
+    '''
     d = datetime.today()
     month = d.month
     weekday = d.weekday()
@@ -69,6 +106,14 @@ def infos():
 
 
 def gen_x():
+    '''Generates sample to be learned
+
+    Returns
+    -------
+    ndarray
+        processed image data and
+        additional infos
+    '''
     img = get_img()
     img_p = preprocess(img)
     x = np.append(img_p, infos())
@@ -76,15 +121,20 @@ def gen_x():
 
 
 def gen_y():
+    '''Generates preferred sample output
+
+    Returns
+    -------
+    ndarray
+        brightness'''
     return np.array([get_brightness()])
 
 
 def main():
+    '''Updates the screen brightness'''
     clf = joblib.load(filename)
-    loop_count = 0
     prev_val = 1000
     while True:
-        loop_count += 1
         try:
             x = gen_x()
             val = clf.predict([x])[0]
@@ -102,10 +152,17 @@ def main():
 
 
 def aquire_data():
+    '''Collects samples to be used by machine learner
+
+    Notes
+    -----
+    Saves ndarrays to ./traindata/
+    '''
     while True:
         x = gen_x()
         y = gen_y()
-        np.save(localpath + "/traindata/XY" + str(time()) + ".npy", np.array([x, y]))
+        np.save(localpath + "/traindata/XY" +
+                str(time()) + ".npy", np.array([x, y]))
         sleep(config.sleep)
 
 
@@ -114,6 +171,13 @@ def dummy():
 
 
 def fit():
+    '''Fits a RandomForest to the traindata
+
+    Notes
+    -----
+    Use aquire_data() before fitting
+    in order to generate the trainingsset
+    '''
     clf = RandomForestRegressor()
     X, Y = [], []
     path = localpath + "/traindata/"
@@ -130,7 +194,4 @@ def fit():
 localpath = __file__.replace(os.path.basename(__file__), "")
 filename = localpath + 'RandomForestRegressor.pkl'
 if __name__ == "__main__":
-    # aquire_data()
     pass
-    # train()
-    # main()

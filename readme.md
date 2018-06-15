@@ -1,6 +1,9 @@
-This repo features two tools to automatically controll the backlight brightness using the modules
-python3-numpy, python3-pygame and (backlight or xbacklight or acpilight)
+Programm to automatically controll your screen brightness.
+It can learn your brightness preferences depending on
+the environment brightness, time and date and then
+use set the brighness for your.
 
+On some machines acpilight is required to set the brighness
 https://github.com/wavexx/acpilight
 
 ## appindicator.py:
@@ -14,7 +17,6 @@ https://github.com/wavexx/acpilight
     but config.py available to set preferences
 
 ## config.py:
-    user preferences, 
-    default set empirically at this time
+    user preferences
 
-all modules are testet on ubuntu 17.10
+all modules are testet on ubuntu 18.04
