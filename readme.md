@@ -18,5 +18,7 @@ https://github.com/wavexx/acpilight
 
 ## config.py:
     user preferences
+    set the path to the programm editing your brightness here
+    in order to make the programm work
 
 all modules are testet on ubuntu 18.04
