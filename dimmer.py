@@ -158,10 +158,13 @@ def aquire_data():
     -----
     Saves ndarrays to ./traindata/
     '''
+    directory = localpath + "/traindata/"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     while True:
         x = gen_x()
         y = gen_y()
-        np.save(localpath + "/traindata/XY" +
+        np.save(directory + "XY" +
                 str(time()) + ".npy", np.array([x, y]))
         sleep(config.sleep)
 
