@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 
-# command to backlight or xbacklight
+# command to backlight or xbacklight or acpilight
 backlight_path = \
     "/home/simtron/Documents/Python/acpilight/xbacklight"
-xb_time = 5000  # milliseconds to switch brightness, xbacklight time
-xb_steps = 5 * 25  # steps to change brightness, xbacklight steps
-update_threshold = 5 # ignore changing brightness when it difference is under threshold
-sleep = 10  # seconds, time between photo detection
+
+# milliseconds to switch brightness, xbacklight time
+xb_time = 5000
+
+# steps to change brightness, xbacklight steps
+xb_steps = 5 * 25
+
+# ignores brightness changes when the difference
+# is under threshold
+update_threshold = 5
+
+
+# seconds, time between photo detection
+sleep = 10
