@@ -3,92 +3,134 @@
 import pygame.camera
 import numpy as np
 import subprocess
-import time
+from time import sleep, time
+from datetime import date
+from datetime import datetime
 import config
+from sklearn.ensemble import RandomForestRegressor
+from scipy.misc import imresize
+from sklearn.externals import joblib
+import os
 
 
 def get_img():
-    '''Gets webcam image and returns it as array.
-
-    Returns
-    -------
-    :obj:`numpy.ndarray`
-        Image taken by webcam
-
-    '''
+    '''gets webcam image and returns it as array'''
+    print("detecting brightness")
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
     cam.start()
     img = cam.get_image()
     cam.stop()
     imgdata = pygame.surfarray.array3d(img)
-    return np.array(imgdata)
+    return imgdata
 
 
 def change_brightness(val):
-    '''Sets screen brightness.
-
-    Parameters
-    ----------
-    val : int
-        Brightness Value
-        0 =< val <= 100'''
+    '''val: int, 0=< val <= 100'''
     acpilight_path = config.backlight_path
     val = str(int(val))
-    subprocess.call([acpilight_path, "-time", str(config.xb_time),
-                     "-steps", str(config.xb_steps), "-set", val])
+    subprocess.call([
+        acpilight_path,
+        "-time",
+        str(config.xb_time),
+        "-steps",
+        str(config.xb_steps),
+        "-set",
+        val])
 
 
-def weight_img(img):
-    '''Weights image by mean and scales mean value.
+def get_brightness():
+    '''val: int, 0=< val <= 100'''
+    acpilight_path = config.backlight_path
+    cmd = " ".join([acpilight_path, "-get"])
+    process = subprocess.Popen(cmd, shell=True,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
 
-    Parameters
-    ----------
-    img : array
+    # wait for the process to terminate
+    out, err = process.communicate()
+    return int(out)
 
-    Returns
-    -------
-    int
-        Weight of image
 
-    '''
-    img = 3 * np.mean(img) / 170 * 100
-    return int(img)
+def preprocess(img, res=4):
+    '''Returns flat ndarray'''
+    img = imresize(img, size=(res, res), interp="lanczos")
+    img = np.mean(img, axis=2)
+    img = img.flatten()
+    return img
+
+
+def infos():
+    d = datetime.today()
+    month = d.month
+    weekday = d.weekday()
+    hour = d.hour
+    return [month, weekday, hour]
+
+
+def gen_x():
+    img = get_img()
+    img_p = preprocess(img)
+    x = np.append(img_p, infos())
+    return x
+
+
+def gen_y():
+    return np.array([get_brightness()])
 
 
 def main():
-    '''Mainloop to autocontroll brightness.
-    '''
-    prev_vals = [100]
-    prev_mean = None
+    clf = joblib.load(filename)
+    loop_count = 0
+    prev_val = 1000
     while True:
+        loop_count += 1
         try:
-            img_val = weight_img(get_img())
-            # if deviation is high, reset prev_vals
-            if abs(img_val - np.mean(prev_vals)) > config.jump_theshold:
-                prev_vals = [img_val]
+            x = gen_x()
+            val = clf.predict([x])[0]
+            dif = np.abs(val - prev_val)
+            if dif > config.update_threshold:
+                print("setting brigness to", val)
+                change_brightness(val)
+                prev_val = val
             else:
-                prev_vals.append(img_val)
-            # smooth by last values to prevent oscillation of brightness
-            if len(prev_vals) < (config.averaging - 1):
-                prev_vals = prev_vals[:(config.averaging - 1)]
-
-            val_mean = int(np.mean(prev_vals))
-            # only steps by 10 to prevent changing the
-            # brightness in every evaluation
-            if val_mean > config.sensible_threshold:
-                val_mean = int(val_mean // config.steps * config.steps)
-            # do not disable screen light
-            elif val_mean < config.low_threshold:
-                val_mean = config.low_light
-            print("setting brigness to", val_mean)
-            if prev_mean != val_mean:
-                change_brightness(val_mean)
-                prev_mean = val_mean
+                print("difference below %d, brighness not changed" %
+                      config.update_threshold)
         except SystemError:
             print("Camera blocked by other Programm")
-        time.sleep(config.sleep)
+        sleep(config.sleep)
 
 
+def aquire_data():
+    while True:
+        x = gen_x()
+        y = gen_y()
+        np.save(localpath + "/traindata/XY" + str(time()) + ".npy", np.array([x, y]))
+        sleep(config.sleep)
+
+
+def dummy():
+    pass
+
+
+def fit():
+    clf = RandomForestRegressor()
+    X, Y = [], []
+    path = localpath + "/traindata/"
+    for file in os.listdir(path):
+        xy = np.load(path + file)
+        X.append(xy[0])
+        Y.append(xy[1][0])
+    X = np.array(X)
+    Y = np.array(Y)
+    clf.fit(X, Y)
+    joblib.dump(clf, filename)
+
+
+localpath = __file__.replace(os.path.basename(__file__), "")
+filename = localpath + 'RandomForestRegressor.pkl'
 if __name__ == "__main__":
-    main()
+    # aquire_data()
+    pass
+    # train()
+    # main()
