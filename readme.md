@@ -21,13 +21,13 @@ https://github.com/wavexx/acpilight
     set the path to the programm editing your brightness here
     in order to make the programm work
 
-#Notes
-##Learning
+# Notes
+## Learning
 Dimmer comes with a pretrained regressor.
 If you start to train your regressor, the pretrained regressor
 is going to be neglected and a new regressor ist trained on
 all data contained in /traindata/.
-##Installation
+## Installation
 Make sure you have installed backlight, xbacklight or acpibacklight or another programm which supports the flags
     -time
     -steps
