@@ -14,6 +14,8 @@ xb_steps = 5 * 25
 # is under threshold
 update_threshold = 5
 
-
 # seconds, time between photo detection
 sleep = 10
+
+# if brightness=0 should be blocked
+block_zero_brightness = True

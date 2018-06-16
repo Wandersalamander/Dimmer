@@ -38,6 +38,8 @@ def change_brightness(val: int):
         value between 0 and 100
         100 -> maximum brightness is set'''
     acpilight_path = config.backlight_path
+    if config.block_zero_brightness:
+        val += 1
     val = str(int(val))
     subprocess.call([
         acpilight_path,
