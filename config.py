@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # command to backlight or xbacklight or acpilight
-backlight_path = \
+backlight_cmd = \
     "/home/simtron/Documents/Python/acpilight/xbacklight"
 
 # milliseconds to switch brightness, xbacklight time

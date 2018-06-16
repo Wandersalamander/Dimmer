@@ -37,12 +37,12 @@ def change_brightness(val: int):
     val: int
         value between 0 and 100
         100 -> maximum brightness is set'''
-    acpilight_path = config.backlight_path
+    cmd = config.backlight_cmd
     if config.block_zero_brightness:
         val += 1
     val = str(int(val))
     subprocess.call([
-        acpilight_path,
+        cmd,
         "-time",
         str(config.xb_time),
         "-steps",
@@ -60,8 +60,8 @@ def get_brightness():
     int,
         0=< val <= 100
     '''
-    acpilight_path = config.backlight_path
-    cmd = " ".join([acpilight_path, "-get"])
+    cmd = config.backlight_cmd
+    cmd = " ".join([cmd, "-get"])
     process = subprocess.Popen(cmd, shell=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
