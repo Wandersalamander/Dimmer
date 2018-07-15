@@ -18,7 +18,8 @@ def get_img():
     Returns
     -------
     ndarray
-        image taken by webcam'''
+        image taken by webcam
+    '''
     print("detecting brightness")
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
@@ -52,14 +53,13 @@ def change_brightness(val: int):
 
 
 def get_brightness():
-    '''Reads current brightness
-
+    """Reads current brighness
 
     Returns
     -------
-    int,
-        0=< val <= 100
-    '''
+    int
+        current brighness
+    """
     cmd = config.backlight_cmd
     cmd = " ".join([cmd, "-get"])
     process = subprocess.Popen(cmd, shell=True,
@@ -71,21 +71,22 @@ def get_brightness():
     return int(out)
 
 
-def preprocess(img, res=4):
-    '''Image Preprocessing
+def preprocess(img: np.ndarray, res=4):
+    """Resizes and flattens image
 
     Parameters
     ----------
-    img: ndarray
+    img : np.ndarray
         image to process
-    res: int, optional
-        resolution to scale the image down
+    res : int, optional
+        image is resized to shape=(res,res) (the default is 4)
 
     Returns
     -------
-    ndarray
-        flat array containing
-        processed image data'''
+    np.ndarray
+        flattened image
+    """
+
     img = imresize(img, size=(res, res), interp="lanczos")
     img = np.mean(img, axis=2)
     img = img.flatten()
